@@ -1,0 +1,24 @@
+version: "3.2"
+services:
+  db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=postgresql
+      - POSTGRES_USER=postgresql
+      - POSTGRES_PASSWORD=postgresql
+
+  javavulny:
+    build: .
+    image: stackhawk/javavulny:latest
+    container_name: javavulny
+    environment:
+      SPRING_PROFILES_ACTIVE: postgresql
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres
+    ports:
+      - "9000:9000"
+    links:
+      - db
+    depends_on:
+      - db

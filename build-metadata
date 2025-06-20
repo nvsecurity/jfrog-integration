@@ -1,0 +1,20 @@
+{
+  "containerimage.buildinfo": {
+    "frontend": "dockerfile.v0",
+    "attrs": {
+      "build-arg:REPO_URL": "nightvision.jfrog.io/javaspringvulny-local",
+      "filename": "Dockerfile",
+      "vcs:revision": "7071c7578b08520c05dd30830a16e2721076241e",
+      "vcs:source": "https://github.com/nvsecurity/jfrog-integration.git"
+    },
+    "sources": [
+      {
+        "type": "docker-image",
+        "ref": "docker.io/library/openjdk:17-jdk-slim",
+        "pin": "sha256:aaa3b3cb27e3e520b8f116863d0580c438ed55ecfa0bc126b41f68c3f62f9774"
+      }
+    ]
+  },
+  "containerimage.config.digest": "sha256:c123836bbe6d1fc5fc579351391b5acc22123c940709c684271d3193f361f99a",
+  "containerimage.digest": "sha256:1ddb7c8bc2cb08e07782bff9c25c8eafa9cb3992db0d7254ae65758405c68533"
+}

@@ -1,0 +1,45 @@
+app:
+  applicationId: ${APP_ID:f5ee2290-3383-415c-96c7-ee0a398d90b9}
+  env: ${APP_ENV:dev}
+  host: ${APP_HOST:https://localhost:9000}
+  excludePaths:
+    - "/logout"
+    - "/login"
+    - "/login-form-multi"
+    - "/login-code"
+  antiCsrfParam: "_csrf"
+  authentication:
+    loggedInIndicator: "\\QSign Out\\E|^HTTP.*20[0-9]|^HTTP.*50[0-9]|^HTTP.*40[0-9]"
+    loggedOutIndicator: ".*Location:.*\\/login.*"
+    script:
+      name: form-auth-multi.kts
+      credentials:
+        username: user
+        password: password
+      parameters:
+        loginPagePath: /login-form-multi
+        loginPage: /login-form-multi
+        logging: "true"
+        formType: "FORM"
+        remember: "on"
+        csrfExtra: "loginCode"
+    cookieAuthorization:
+      cookieNames:
+        - "JSESSIONID"
+        - "XLOGINID"
+    testPath:
+      path: /search
+      success: "HTTP.*200.*"
+hawk:
+  spider:
+    maxDurationMinutes: 5
+hawkAddOn:
+  scripts:
+    - name: form-auth-multi.kts
+      language: KOTLIN
+      type: authentication
+      path: hawkscripts
+#    - name: custom-sender.kts
+#      language: KOTLIN
+#      type: httpsender
+#      path: hawkscripts

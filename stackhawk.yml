@@ -1,0 +1,28 @@
+app:
+  applicationId: ${APP_ID:747797df-f803-4cf4-9486-7020f58b8deb}
+  env: ${APP_ENV:Development}
+  host: ${APP_HOST:https://localhost:9000}
+  waitForAppTarget:
+    path: /
+    waitTimeoutMillis: 200000
+    pollDelay: 500
+  excludePaths:
+    - "/logout"
+  antiCsrfParam: "_csrf"
+  authentication:
+    loggedInIndicator: "\\QSign Out\\E"
+    loggedOutIndicator: ".*Location:.*/login.*"
+    usernamePassword:
+      type: FORM
+      loginPath: /login
+      loginPagePath: /login
+      usernameField: username
+      passwordField: password
+      scanUsername: "janesmith"
+      scanPassword: "password"
+    cookieAuthorization:
+      cookieNames:
+        - "JSESSIONID"
+    testPath:
+      path: /search
+      success: "HTTP.*200.*"
