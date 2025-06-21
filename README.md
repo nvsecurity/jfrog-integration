@@ -2,7 +2,7 @@
 
 NightVision offers DAST and API discovery capabilities that complement JFrog's artifact management and software distribution solutions. By integrating NightVision into the JFrog platform, JFrog can help developers not only manage and deliver trusted binaries, but also validate the security of the live web apps and APIs that those artifacts power. 
 
-This document descibes how to use the NightVision CLI and the JFrog CLI to build and upload docker images, run DAST scan against local containers, and attach the evidence to docker images deployed to JFrog Artifactory. 
+This document describes how to use the NightVision CLI and the JFrog CLI to build and upload docker images, run DAST scan against local containers, and attach the evidence to docker images deployed to JFrog Artifactory. 
 
 Refer to [nightvision-evidence.yml](https://github.com/nvsecurity/jfrog-integration/blob/main/.github/workflows/nightvision-evidence.yml) for the complete script.
 
@@ -10,7 +10,7 @@ Refer to [nightvision-evidence.yml](https://github.com/nvsecurity/jfrog-integrat
 
 * Install JFrog CLI ([instructions](https://jfrog.com/getcli/)).
 * Create a JFrog docker repository ([instructions](https://jfrog.com/help/r/jfrog-artifactory-documentation/set-up-a-docker-repository)).
-* Generate the docker repositor access token (Go to `Artifactory->Artifacts` and select the repository created in the previous step. Click the `Set Me Up` button. Go to the `Configure` tab in the `Set Up A Docker Client` popup and click the `Generate Token` button to generate the access token).
+* Generate the docker repository access token (Go to `Artifactory->Artifacts` and select the repository created in the previous step. Click the `Set Me Up` button. Go to the `Configure` tab in the `Set Up A Docker Client` popup and click the `Generate Token` button to generate the access token).
 * Create the key pair for evidence collection and upload the public key to JFrog ([instructions](https://jfrog.com/help/r/jfrog-artifactory-documentation/evidence-setup)).
 * Install NightVision CLI ([instructions](https://docs.nightvision.net/docs/installing-the-cli)).
 * Create a NightVision authentication token ([instructions](https://docs.nightvision.net/docs/api-tokens)).
