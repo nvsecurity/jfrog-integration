@@ -4,6 +4,8 @@ NightVision offers DAST and API discovery capabilities that complement JFrog's a
 
 This document descibes how to use the NightVision CLI and the JFrog CLI to build and upload docker images, run DAST scan against local containers, and attach the evidence to docker images deployed to JFrog Artifactory. 
 
+Refer to [nightvision-evidence.yml](https://github.com/nvsecurity/jfrog-integration/blob/main/.github/workflows/nightvision-evidence.yml) for the complete script.
+
 ## Prerequisites
 
 * Install JFrog CLI ([instructions](https://jfrog.com/getcli/)).
