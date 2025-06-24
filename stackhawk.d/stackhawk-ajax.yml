@@ -1,7 +1,0 @@
-hawk:
-  spider:
-    ajax: true
-    ajaxBrowser: CHROME_HEADLESS
-  config:
-    - "ajaxSpider.eventWait=20"
-    - "ajaxSpider.reloadWait=70"
