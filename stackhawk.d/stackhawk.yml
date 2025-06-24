@@ -1,4 +1,0 @@
-app:
-  applicationId: ${APP_ID:f5ee2290-3383-415c-96c7-ee0a398d90b9}
-  env: ${APP_ENV:dev}
-  host: ${APP_HOST:https://localhost:9000}
