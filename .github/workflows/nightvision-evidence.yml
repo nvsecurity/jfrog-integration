@@ -70,12 +70,9 @@ jobs:
           nightvision scan ${NIGHTVISION_TARGET} --auth ${NIGHTVISION_AUTH} > scan-results.txt
           nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file openapi-spec.yml -o ${NIGHTVISION_SCAN_RESULT}
 
-      - name: Install sarif-to-markdown
-        run: npm ci && npm install --no-save @security-alert/sarif-to-markdown
-
       - name: Convert sarif to markdown
         run: |
-          sarif-to-markdown ${NIGHTVISION_SCAN_RESULT} > nightvision_scan_result.md 
+          npx @security-alert/sarif-to-markdown ${NIGHTVISION_SCAN_RESULT} > nightvision_scan_result.md 
 
       - name: Upload evidence to the docker package
         run: |
