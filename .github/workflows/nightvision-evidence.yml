@@ -84,7 +84,7 @@ jobs:
           --key-alias nightvision_evidence_key \
           --provider-id nightvision \
           --predicate ${{ env.NIGHTVISION_SCAN_RESULT }} \
-          --predicate-type https://in-toto.io/attestation/vulns \
+          --predicate-type https://nightvision.net/evidence/vulnscan/v1 \
           --markdown nightvision_scan_result.md
 
       - name: Publish build info
