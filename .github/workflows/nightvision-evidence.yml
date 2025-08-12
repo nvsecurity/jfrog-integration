@@ -72,7 +72,7 @@ jobs:
 
       - name: Convert sarif to markdown
         run: |
-          npx @security-alert/sarif-to-markdown ${NIGHTVISION_SCAN_RESULT} > nightvision_scan_result.md 
+          python sarif_to_markdown.py ${NIGHTVISION_SCAN_RESULT} nightvision_scan_result.md
 
       - name: Upload evidence to the docker package
         run: |
