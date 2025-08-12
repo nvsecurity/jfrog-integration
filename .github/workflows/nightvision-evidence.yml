@@ -74,6 +74,11 @@ jobs:
         run: |
           python sarif_to_markdown.py ${NIGHTVISION_SCAN_RESULT} nightvision_scan_result.md
 
+      - name: Print scan result markdown
+        run: |
+          echo "=== NightVision Scan Result ==="
+          cat nightvision_scan_result.md
+
       - name: Upload evidence to the docker package
         run: |
           jf evd create \
