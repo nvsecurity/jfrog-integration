@@ -97,7 +97,7 @@ jobs:
           --key-alias nightvision_evidence_key \
           --provider-id nightvision \
           --predicate openapi-spec.json \
-          --predicate-type https://nightvision.net/evidence/vulnscan/v1
+          --predicate-type https://nightvision.net/evidence/openapi-spec/v1
 
       - name: Publish build info
         run: jfrog rt build-publish ${{ vars.BUILD_NAME }} ${{ github.run_number }}
