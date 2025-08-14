@@ -57,9 +57,9 @@ jobs:
       
       - name: Extract API documentation from code
         run: |
-          nightvision swagger extract . --target ${NIGHTVISION_TARGET} --lang java || true
-          if [ ! -e openapi-spec.yml ]; then
-              cp backup-openapi-spec.yml openapi-spec.yml
+          nightvision swagger extract . --target ${NIGHTVISION_TARGET} --lang java --file-format json || true
+          if [ ! -e openapi-spec.json ]; then
+              cp backup-openapi-spec.json openapi-spec.json
           fi
 
       - name: Start the app
@@ -68,7 +68,7 @@ jobs:
       - name: Scan the app
         run: |
           nightvision scan ${NIGHTVISION_TARGET} --auth ${NIGHTVISION_AUTH} > scan-results.txt
-          nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file openapi-spec.yml -o ${NIGHTVISION_SCAN_RESULT}
+          nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file openapi-spec.json -o ${NIGHTVISION_SCAN_RESULT}
 
       - name: Convert sarif to markdown
         run: |
@@ -96,7 +96,7 @@ jobs:
           --key "${{ secrets.PRIVATE_KEY }}" \
           --key-alias nightvision_evidence_key \
           --provider-id nightvision \
-          --predicate openapi-spec.yml \
+          --predicate openapi-spec.json \
           --predicate-type https://nightvision.net/evidence/vulnscan/v1
 
       - name: Publish build info
