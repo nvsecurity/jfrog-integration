@@ -54,12 +54,14 @@ jobs:
           echo "NIGHTVISION_AUTH=javaspringvulny-api" >> $GITHUB_ENV
           echo "NIGHTVISION_TOKEN=${{ secrets.NIGHTVISION_TOKEN }}" >> $GITHUB_ENV
           echo "NIGHTVISION_SCAN_RESULT=scan_result.sarif" >> $GITHUB_ENV
+          echo "NIGHTVISION_SCAN_RESULT_MARKDOWN=scan_result.md" >> $GITHUB_ENV
+          echo "NIGHTVISION_OPENAPI_SPEC=openapi-spec.json" >> $GITHUB_ENV
       
       - name: Extract API documentation from code
         run: |
-          nightvision swagger extract . --target ${NIGHTVISION_TARGET} --lang java || true
-          if [ ! -e openapi-spec.yml ]; then
-              cp backup-openapi-spec.yml openapi-spec.yml
+          nightvision swagger extract . --target ${NIGHTVISION_TARGET} --lang java --file-format json || true
+          if [ ! -e ${NIGHTVISION_OPENAPI_SPEC} ]; then
+              cp backup-openapi-spec.json ${NIGHTVISION_OPENAPI_SPEC}
           fi
 
       - name: Start the app
@@ -68,7 +70,11 @@ jobs:
       - name: Scan the app
         run: |
           nightvision scan ${NIGHTVISION_TARGET} --auth ${NIGHTVISION_AUTH} > scan-results.txt
-          nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file openapi-spec.yml -o ${NIGHTVISION_SCAN_RESULT}
+          nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file ${NIGHTVISION_OPENAPI_SPEC} -o ${NIGHTVISION_SCAN_RESULT}
+
+      - name: Convert sarif to markdown
+        run: |
+          python sarif_to_markdown.py ${NIGHTVISION_SCAN_RESULT} ${NIGHTVISION_SCAN_RESULT_MARKDOWN}
 
       - name: Upload evidence to the docker package
         run: |
@@ -78,8 +84,22 @@ jobs:
           --package-repo-name ${{ vars.DOCKER_REPO }} \
           --key "${{ secrets.PRIVATE_KEY }}" \
           --key-alias nightvision_evidence_key \
+          --provider-id ${{ vars.NIGHTVISION_PROVIDER_ID }} \
           --predicate ${{ env.NIGHTVISION_SCAN_RESULT }} \
-          --predicate-type https://in-toto.io/attestation/vulns
+          --predicate-type ${{ vars.NIGHTVISION_SCAN_RESULT_PREDICATE_TYPE }} \
+          --markdown ${{ env.NIGHTVISION_SCAN_RESULT_MARKDOWN }}
+
+      - name: Upload OpenAPI spec to the docker package
+        run: |
+          jf evd create \
+          --package-name ${{ vars.IMAGE_NAME }} \
+          --package-version "${{ env.IMAGE_TAG }}" \
+          --package-repo-name ${{ vars.DOCKER_REPO }} \
+          --key "${{ secrets.PRIVATE_KEY }}" \
+          --key-alias nightvision_evidence_key \
+          --provider-id ${{ vars.NIGHTVISION_PROVIDER_ID }} \
+          --predicate ${{ env.NIGHTVISION_OPENAPI_SPEC }} \
+          --predicate-type ${{ vars.NIGHTVISION_OPENAPI_SPEC_PREDICATE_TYPE }}
 
       - name: Publish build info
         run: jfrog rt build-publish ${{ vars.BUILD_NAME }} ${{ github.run_number }}
