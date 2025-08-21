@@ -70,7 +70,7 @@ jobs:
       - name: Scan the app
         run: |
           nightvision scan ${NIGHTVISION_TARGET} --auth ${NIGHTVISION_AUTH} > scan-results.txt
-          nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file openapi-spec.json -o ${NIGHTVISION_SCAN_RESULT}
+          nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file ${NIGHTVISION_OPENAPI_SPEC} -o ${NIGHTVISION_SCAN_RESULT}
 
       - name: Convert sarif to markdown
         run: |

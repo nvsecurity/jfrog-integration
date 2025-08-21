@@ -20,6 +20,9 @@ Refer to [nightvision-evidence.yml](https://github.com/nvsecurity/jfrog-integrat
   * `BUILD_NAME` (name of the docker image build)
   * `DOCKER_REPO` (name of the JFrog docker repository)
   * `IMAGE_NAME` (name of the docker image)
+  * `NIGHTVISION_PROVIDER_ID` (name of the provider that created the evidence)
+  * `NIGHTVISION_SCAN_RESULT_PREDICATE_TYPE` (predicate type for the DAST scan result)
+  * `NIGHTVISION_OPENAPI_SPEC_PREDICATE_TYPE` (predicate type for the OpenAPI spec)
 * Configure the following repository secrets in GitHub 
   * `ARTIFACTORY_ACCESS_TOKEN` (access token for the JFrog artifactory server)
   * `JF_USER` (user name of the JFrog artifactory server)
@@ -97,8 +100,8 @@ Scan the API source code automatically generate the Swagger file
 - name: Extract API documentation from code
   run: |
     nightvision swagger extract . --target ${NIGHTVISION_TARGET} --lang java || true
-      if [ ! -e openapi-spec.yml ]; then
-        cp backup-openapi-spec.yml openapi-spec.yml
+      if [ ! -e ${NIGHTVISION_OPENAPI_SPEC} ]; then
+        cp backup-openapi-spec.json ${NIGHTVISION_OPENAPI_SPEC}
       fi
 ```
 
@@ -117,7 +120,17 @@ Scan the application using the auto-generated Swagger file
 - name: Scan the app
   run: |
     nightvision scan ${NIGHTVISION_TARGET} --auth ${NIGHTVISION_AUTH} > scan-results.txt
-    nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file openapi-spec.yml -o ${NIGHTVISION_SCAN_RESULT}
+    nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file ${NIGHTVISION_OPENAPI_SPEC} -o ${NIGHTVISION_SCAN_RESULT}
+```
+
+### Markdown Conversion
+
+Convert the scan result from Sarif to Markdown
+
+```yaml
+- name: Convert sarif to markdown
+  run: |
+    python sarif_to_markdown.py ${NIGHTVISION_SCAN_RESULT} ${NIGHTVISION_SCAN_RESULT_MARKDOWN}
 ```
 
 ## Attach DAST Scan Evidence 
@@ -133,13 +146,31 @@ Sign the DAST scan result using the private key and upload it to the docker repo
     --package-repo-name ${{ vars.DOCKER_REPO }} \
     --key ${{ secrets.PRIVATE_KEY }} \
     --key-alias nightvision_evidence_key \
-    --predicate ${NIGHTVISION_SCAN_RESULT} \
-    --predicate-type https://in-toto.io/attestation/vulns
+    --provider-id ${{ vars.NIGHTVISION_PROVIDER_ID }} \
+    --predicate ${{ env.NIGHTVISION_SCAN_RESULT }} \
+    --predicate-type ${{ vars.NIGHTVISION_SCAN_RESULT_PREDICATE_TYPE }} \
+    --markdown ${{ env.NIGHTVISION_SCAN_RESULT_MARKDOWN }}
+```
+
+## Attach OpenAPI Spec Evidence 
+
+Sign the auto-generated OpenAPI spec using the private key and upload it to the docker repository
+
+```yaml
+- name: Upload OpenAPI spec to the docker package
+  run: |
+    jf evd create \
+    --package-name ${{ vars.IMAGE_NAME }} \
+    --package-version "${{ env.IMAGE_TAG }}" \
+    --package-repo-name ${{ vars.DOCKER_REPO }} \
+    --key "${{ secrets.PRIVATE_KEY }}" \
+    --key-alias nightvision_evidence_key \
+    --provider-id ${{ vars.NIGHTVISION_PROVIDER_ID }} \
+    --predicate ${{ env.NIGHTVISION_OPENAPI_SPEC }} \
+    --predicate-type ${{ vars.NIGHTVISION_OPENAPI_SPEC_PREDICATE_TYPE }}
 ```
 
 ## Note 
 
-1. It appears the `jf rt build-docker-create` command will create two different package versions: a version using the GitHub run number and a version using the `sha256` digest. The evidence will be attached to the version using the GitHub run number. 
-2. NightVision currently uses the `https://in-toto.io/attestation/vulns` predicate type when attaching the evidence. We can switch to a different predicate type if required. 
-3. In addition to attaching the DAST scan evidence, NightVision can attach the auto-generated Swagger file as evidence as well. 
+1. It appears the `jf rt build-docker-create` command will create two different package versions: a version using the GitHub run number and a version using the `sha256` digest. The evidence will be attached to the version using the GitHub run number.
 
