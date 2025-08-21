@@ -24,15 +24,6 @@ jobs:
           username: ${{ secrets.JF_USER }}
           password: ${{ secrets.ARTIFACTORY_ACCESS_TOKEN }}
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3    
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          platforms: linux/amd64,linux/arm64
-          install: true
-
       - name: Install NightVision cli
         run: | 
           wget -c https://downloads.nightvision.net/binaries/latest/nightvision_latest_linux_amd64.tar.gz -O - | tar -xz; sudo mv nightvision /usr/local/bin/
@@ -45,7 +36,7 @@ jobs:
           echo "Pushing Docker Image to Artifactory"
           jf rt docker-push ${REPO_URL}/javaspringvulny:${{ github.run_number }} javaspringvulny --build-name=${{ vars.BUILD_NAME }} --build-number=${{ github.run_number }}
           echo "Pushing Docker Image to Artifactory completed"
-          
+
       # Set required environment variables (update as needed)
       - name: Set environment variables
         run: |
