@@ -54,12 +54,14 @@ jobs:
           echo "NIGHTVISION_AUTH=javaspringvulny-api" >> $GITHUB_ENV
           echo "NIGHTVISION_TOKEN=${{ secrets.NIGHTVISION_TOKEN }}" >> $GITHUB_ENV
           echo "NIGHTVISION_SCAN_RESULT=scan_result.sarif" >> $GITHUB_ENV
+          echo "NIGHTVISION_SCAN_RESULT_MARKDOWN=scan_result.md" >> $GITHUB_ENV
+          echo "NIGHTVISION_OPENAPI_SPEC=openapi-spec.json" >> $GITHUB_ENV
       
       - name: Extract API documentation from code
         run: |
           nightvision swagger extract . --target ${NIGHTVISION_TARGET} --lang java --file-format json || true
-          if [ ! -e openapi-spec.json ]; then
-              cp backup-openapi-spec.json openapi-spec.json
+          if [ ! -e ${NIGHTVISION_OPENAPI_SPEC} ]; then
+              cp backup-openapi-spec.json ${NIGHTVISION_OPENAPI_SPEC}
           fi
 
       - name: Start the app
@@ -72,7 +74,7 @@ jobs:
 
       - name: Convert sarif to markdown
         run: |
-          python sarif_to_markdown.py ${NIGHTVISION_SCAN_RESULT} nightvision_scan_result.md
+          python sarif_to_markdown.py ${NIGHTVISION_SCAN_RESULT} ${NIGHTVISION_SCAN_RESULT_MARKDOWN}
 
       - name: Upload evidence to the docker package
         run: |
@@ -82,10 +84,10 @@ jobs:
           --package-repo-name ${{ vars.DOCKER_REPO }} \
           --key "${{ secrets.PRIVATE_KEY }}" \
           --key-alias nightvision_evidence_key \
-          --provider-id nightvision \
+          --provider-id ${{ vars.NIGHTVISION_PROVIDER_ID }} \
           --predicate ${{ env.NIGHTVISION_SCAN_RESULT }} \
-          --predicate-type https://nightvision.net/evidence/vulnscan/v1 \
-          --markdown nightvision_scan_result.md
+          --predicate-type ${{ vars.NIGHTVISION_SCAN_RESULT_PREDICATE_TYPE }} \
+          --markdown ${{ env.NIGHTVISION_SCAN_RESULT_MARKDOWN }}
 
       - name: Upload OpenAPI spec to the docker package
         run: |
@@ -95,9 +97,9 @@ jobs:
           --package-repo-name ${{ vars.DOCKER_REPO }} \
           --key "${{ secrets.PRIVATE_KEY }}" \
           --key-alias nightvision_evidence_key \
-          --provider-id nightvision \
-          --predicate openapi-spec.json \
-          --predicate-type https://nightvision.net/evidence/openapi-spec/v1
+          --provider-id ${{ vars.NIGHTVISION_PROVIDER_ID }} \
+          --predicate ${{ env.NIGHTVISION_OPENAPI_SPEC }} \
+          --predicate-type ${{ vars.NIGHTVISION_OPENAPI_SPEC_PREDICATE_TYPE }}
 
       - name: Publish build info
         run: jfrog rt build-publish ${{ vars.BUILD_NAME }} ${{ github.run_number }}
