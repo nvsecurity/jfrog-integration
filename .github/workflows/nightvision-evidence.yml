@@ -34,7 +34,7 @@ jobs:
           REPO_URL=${URL}'/javaspringvulny-local'
           docker build . --file Dockerfile --tag ${REPO_URL}/javaspringvulny:${{ github.run_number }}
           echo "Pushing Docker Image to Artifactory"
-          jf rt docker-push ${REPO_URL}/javaspringvulny:${{ github.run_number }} javaspringvulny --build-name=${{ vars.BUILD_NAME }} --build-number=${{ github.run_number }}
+          jf rt docker-push ${REPO_URL}/javaspringvulny:${{ github.run_number }} javaspringvulny-local --build-name=${{ vars.BUILD_NAME }} --build-number=${{ github.run_number }}
           echo "Pushing Docker Image to Artifactory completed"
 
       # Set required environment variables (update as needed)
