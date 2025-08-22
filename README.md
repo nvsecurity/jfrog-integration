@@ -2,24 +2,24 @@
 
 NightVision offers DAST and API discovery capabilities that complement JFrog's artifact management and software distribution solutions. By integrating NightVision into the JFrog platform, JFrog can help developers not only manage and deliver trusted binaries, but also validate the security of the live web apps and APIs that those artifacts power. 
 
-This document describes how to use the NightVision CLI and the JFrog CLI to build and upload docker images, run DAST scan against local containers, and attach the evidence to docker images deployed to JFrog Artifactory. 
+This document describes how to use the NightVision CLI and the JFrog CLI to build and upload Docker images, run DAST scan against local containers, and attach the evidence to Docker images deployed to JFrog Artifactory. 
 
 Refer to [nightvision-evidence.yml](https://github.com/nvsecurity/jfrog-integration/blob/main/.github/workflows/nightvision-evidence.yml) for the complete script.
 
 ## Prerequisites
 
 * Install JFrog CLI ([instructions](https://jfrog.com/getcli/)).
-* Create a JFrog docker repository ([instructions](https://jfrog.com/help/r/jfrog-artifactory-documentation/set-up-a-docker-repository)).
-* Generate the docker repository access token (Go to `Artifactory->Artifacts` and select the repository created in the previous step. Click the `Set Me Up` button. Go to the `Configure` tab in the `Set Up A Docker Client` popup and click the `Generate Token` button to generate the access token).
+* Create a JFrog Docker repository ([instructions](https://jfrog.com/help/r/jfrog-artifactory-documentation/set-up-a-docker-repository)).
+* Generate the Docker repository access token (Go to `Artifactory->Artifacts` and select the repository created in the previous step. Click the `Set Me Up` button. Go to the `Configure` tab in the `Set Up A Docker Client` popup and click the `Generate Token` button to generate the access token).
 * Create the key pair for evidence collection and upload the public key to JFrog ([instructions](https://jfrog.com/help/r/jfrog-artifactory-documentation/evidence-setup)).
 * Install NightVision CLI ([instructions](https://docs.nightvision.net/docs/installing-the-cli)).
 * Create a NightVision authentication token ([instructions](https://docs.nightvision.net/docs/api-tokens)).
 * Create the NightVision scan target ([instructions](https://docs.nightvision.net/docs/targets-copy)) and (optionally) authentication script ([instructions](https://docs.nightvision.net/docs/authentication)).
 * Configure the following repository variables in GitHub
   * `ARTIFACTORY_URL` (url of the JFrog artifactory server)
-  * `BUILD_NAME` (name of the docker image build)
-  * `DOCKER_REPO` (name of the JFrog docker repository)
-  * `IMAGE_NAME` (name of the docker image)
+  * `BUILD_NAME` (name of the Docker image build)
+  * `DOCKER_REPO` (name of the JFrog Docker repository)
+  * `IMAGE_NAME` (name of the Docker image)
   * `NIGHTVISION_PROVIDER_ID` (name of the provider that created the evidence)
   * `NIGHTVISION_SCAN_RESULT_PREDICATE_TYPE` (predicate type for the DAST scan result)
   * `NIGHTVISION_OPENAPI_SPEC_PREDICATE_TYPE` (predicate type for the OpenAPI spec)
@@ -47,21 +47,21 @@ Install the latest version of the JFrog CLI and performs checkout. Please note a
 
 ### Log Into the Artifactory Docker Registry
 
-Log into the docker registry, and sets up QEMU and Docker Buildx in preparation for building the docker image
+Log into the Docker registry, and sets up QEMU and Docker Buildx in preparation for building the Docker image
 
 ```yaml
 - name: Log in to Artifactory Docker Registry
-  uses: docker/login-action@v3
+  uses: Docker/login-action@v3
   with:
     registry: ${{ vars.ARTIFACTORY_URL }}
     username: ${{ secrets.JF_USER }}
     password: ${{ secrets.ARTIFACTORY_ACCESS_TOKEN }}
 
 - name: Set up QEMU
-  uses: docker/setup-qemu-action@v3    
+  uses: Docker/setup-qemu-action@v3    
 
 - name: Set up Docker Buildx
-  uses: docker/setup-buildx-action@v3
+  uses: Docker/setup-buildx-action@v3
   with:
     platforms: linux/amd64,linux/arm64
     install: true
@@ -77,14 +77,14 @@ Log into the docker registry, and sets up QEMU and Docker Buildx in preparation 
 
 ## Build the Docker Image 
 
-Build the docker image and upload it to artifactory
+Build the Docker image and upload it to artifactory
 
 ```yaml
-- name: Build docker image
+- name: Build Docker image
   run: |
     URL=$(echo ${{ vars.ARTIFACTORY_URL }} | sed 's|^https://||')
     REPO_URL=${URL}'/javaspringvulny-local'
-    docker build --build-arg REPO_URL=${REPO_URL} -f Dockerfile . \
+    Docker build --build-arg REPO_URL=${REPO_URL} -f dockerfile . \
     --tag ${REPO_URL}/javaspringvulny:${{ github.run_number }} \
     --output=type=image --platform linux/amd64 --metadata-file=build-metadata --push
     jf rt build-docker-create javaspringvulny-local --image-file build-metadata --build-name ${{ vars.BUILD_NAME }} --build-number ${{ github.run_number }}
@@ -135,10 +135,10 @@ Convert the scan result from Sarif to Markdown
 
 ## Attach DAST Scan Evidence 
 
-Sign the DAST scan result using the private key and upload it to the docker repository
+Sign the DAST scan result using the private key and upload it to the Docker repository
 
 ```yaml
-- name: Upload evidence to the docker package
+- name: Upload evidence to the Docker package
   run: |
     jf evd create \
     --package-name ${{ vars.IMAGE_NAME }} \
@@ -154,10 +154,10 @@ Sign the DAST scan result using the private key and upload it to the docker repo
 
 ## Attach OpenAPI Spec Evidence 
 
-Sign the auto-generated OpenAPI spec using the private key and upload it to the docker repository
+Sign the auto-generated OpenAPI spec using the private key and upload it to the Docker repository
 
 ```yaml
-- name: Upload OpenAPI spec to the docker package
+- name: Upload OpenAPI spec to the Docker package
   run: |
     jf evd create \
     --package-name ${{ vars.IMAGE_NAME }} \
