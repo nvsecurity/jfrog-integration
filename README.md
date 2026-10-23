@@ -12,9 +12,9 @@ Refer to [nightvision-evidence.yml](https://github.com/nvsecurity/jfrog-integrat
 * Create a JFrog Docker repository ([instructions](https://jfrog.com/help/r/jfrog-artifactory-documentation/set-up-a-docker-repository)).
 * Generate the Docker repository access token (Go to `Artifactory->Artifacts` and select the repository created in the previous step. Click the `Set Me Up` button. Go to the `Configure` tab in the `Set Up A Docker Client` popup and click the `Generate Token` button to generate the access token).
 * Create the key pair for evidence collection and upload the public key to JFrog ([instructions](https://jfrog.com/help/r/jfrog-artifactory-documentation/evidence-setup)).
-* Install NightVision CLI ([instructions](https://docs.nightvision.net/docs/installing-the-cli)).
-* Create a NightVision authentication token ([instructions](https://docs.nightvision.net/docs/api-tokens)).
-* Create the NightVision scan target ([instructions](https://docs.nightvision.net/docs/targets-copy)) and (optionally) authentication script ([instructions](https://docs.nightvision.net/docs/authentication)).
+* Install NightVision CLI ([instructions](https://docs.nightviz.ai/welcome/tutorials-and-guides/installing-the-cli/)).
+* Create a NightVision authentication token ([instructions](https://docs.nightviz.ai/welcome/key-concepts/settings/api-tokens/)).
+* Create the NightVision scan target ([instructions](https://docs.nightviz.ai/welcome/key-concepts/targets-copy/)) and (optionally) authentication script ([instructions](https://docs.nightviz.ai/welcome/key-concepts/authentication/)).
 * Configure the following repository variables in GitHub
   * `ARTIFACTORY_URL` (url of the JFrog artifactory server)
   * `BUILD_NAME` (name of the Docker image build)
